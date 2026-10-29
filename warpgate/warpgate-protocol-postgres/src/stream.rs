@@ -1,0 +1,166 @@
+use std::fmt::Debug;
+
+use bytes::BytesMut;
+use pgwire::error::{PgWireError, PgWireResult};
+use pgwire::messages::{DecodeContext, PgWireBackendMessage, PgWireFrontendMessage};
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
+use tracing::trace;
+use warpgate_tls::{MaybeTlsStream, MaybeTlsStreamError, UpgradableStream};
+
+#[derive(thiserror::Error, Debug)]
+pub enum PostgresStreamError {
+    #[error("decode: {0}")]
+    Decode(#[from] PgWireError),
+    #[error("I/O: {0}")]
+    Io(#[from] std::io::Error),
+}
+
+pub trait PostgresEncode {
+    fn encode(&self, buf: &mut BytesMut) -> PgWireResult<()>
+    where
+        Self: Sized;
+}
+
+pub trait PostgresDecode {
+    fn decode(buf: &mut BytesMut, ctx: &DecodeContext) -> PgWireResult<Option<Self>>
+    where
+        Self: Sized;
+}
+
+#[derive(Debug)]
+pub enum PgWireStartupOrSslRequest {
+    Startup(pgwire::messages::startup::Startup),
+    SslRequest(pgwire::messages::startup::SslRequest),
+    GssEncRequest(pgwire::messages::startup::GssEncRequest),
+}
+
+impl PostgresDecode for PgWireStartupOrSslRequest {
+    fn decode(buf: &mut BytesMut, ctx: &DecodeContext) -> PgWireResult<Option<Self>> {
+        // All three are distinguished by the magic number in their 8-byte header;
+        // a shorter buffer isn't decodable as any of them yet.
+        if pgwire::messages::startup::SslRequest::is_ssl_request_packet(buf) {
+            return pgwire::messages::startup::SslRequest::decode(buf, ctx)
+                .map(|x| x.map(Self::SslRequest));
+        }
+        if pgwire::messages::startup::GssEncRequest::is_gss_enc_request_packet(buf) {
+            return pgwire::messages::startup::GssEncRequest::decode(buf, ctx)
+                .map(|x| x.map(Self::GssEncRequest));
+        }
+        pgwire::messages::startup::Startup::decode(buf, ctx).map(|x| x.map(Self::Startup))
+    }
+}
+
+#[derive(Debug)]
+pub struct PgWireGenericFrontendMessage(pub PgWireFrontendMessage);
+
+#[derive(Debug)]
+pub struct PgWireGenericBackendMessage(pub PgWireBackendMessage);
+
+impl PostgresDecode for PgWireGenericFrontendMessage {
+    fn decode(buf: &mut BytesMut, ctx: &DecodeContext) -> PgWireResult<Option<Self>> {
+        pgwire::messages::PgWireFrontendMessage::decode(buf, ctx)
+            .map(|x| x.map(PgWireGenericFrontendMessage))
+    }
+}
+
+impl PostgresDecode for PgWireGenericBackendMessage {
+    fn decode(buf: &mut BytesMut, ctx: &DecodeContext) -> PgWireResult<Option<Self>> {
+        PgWireBackendMessage::decode(buf, ctx).map(|x| x.map(PgWireGenericBackendMessage))
+    }
+}
+
+impl<T: pgwire::messages::Message> PostgresDecode for T {
+    fn decode(buf: &mut BytesMut, ctx: &DecodeContext) -> PgWireResult<Option<Self>> {
+        T::decode(buf, ctx)
+    }
+}
+
+impl PostgresEncode for PgWireGenericFrontendMessage {
+    fn encode(&self, buf: &mut BytesMut) -> PgWireResult<()> {
+        self.0.encode(buf)
+    }
+}
+
+impl PostgresEncode for PgWireGenericBackendMessage {
+    fn encode(&self, buf: &mut BytesMut) -> PgWireResult<()> {
+        self.0.encode(buf)
+    }
+}
+
+impl<T: pgwire::messages::Message> PostgresEncode for T {
+    fn encode(&self, buf: &mut BytesMut) -> PgWireResult<()> {
+        self.encode(buf)
+    }
+}
+
+pub struct PostgresStream<S, TS>
+where
+    S: UpgradableStream<TS>,
+    S: AsyncRead + AsyncWrite + Send + Unpin,
+    TS: AsyncRead + AsyncWrite + Unpin,
+{
+    stream: MaybeTlsStream<S, TS>,
+    inbound_buffer: BytesMut,
+    outbound_buffer: BytesMut,
+}
+
+impl<S, TS> PostgresStream<S, TS>
+where
+    S: UpgradableStream<TS>,
+    S: AsyncRead + AsyncWrite + Send + Unpin,
+    TS: AsyncRead + AsyncWrite + Unpin,
+{
+    pub fn new(stream: S) -> Self {
+        Self {
+            stream: MaybeTlsStream::new(stream),
+            inbound_buffer: BytesMut::new(),
+            outbound_buffer: BytesMut::new(),
+        }
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn push<M: PostgresEncode + Debug>(
+        &mut self,
+        message: M,
+    ) -> Result<(), PostgresStreamError> {
+        trace!(?message, "sending");
+        message.encode(&mut self.outbound_buffer)?;
+        Ok(())
+    }
+
+    pub async fn flush(&mut self) -> std::io::Result<()> {
+        self.stream.write_all(&self.outbound_buffer[..]).await?;
+        self.outbound_buffer = BytesMut::new();
+        self.stream.flush().await?;
+        Ok(())
+    }
+
+    pub(crate) async fn recv<T: PostgresDecode + Debug>(
+        &mut self,
+        ctx: &DecodeContext,
+    ) -> Result<Option<T>, PostgresStreamError> {
+        loop {
+            if let Some(message) = T::decode(&mut self.inbound_buffer, ctx)? {
+                trace!(?message, "received");
+                return Ok(Some(message));
+            }
+
+            let read_bytes = self.stream.read_buf(&mut self.inbound_buffer).await?;
+            if read_bytes == 0 {
+                return Ok(None);
+            }
+        }
+    }
+
+    pub(crate) async fn upgrade(
+        mut self,
+        config: <S as UpgradableStream<TS>>::UpgradeConfig,
+    ) -> Result<Self, MaybeTlsStreamError> {
+        // Any data already read off the socket past the last decoded message
+        // is the beginning of the TLS handshake and has to be replayed into
+        // the TLS layer (#1421).
+        let leftover = std::mem::take(&mut self.inbound_buffer).freeze();
+        self.stream = self.stream.upgrade(config, leftover).await?;
+        Ok(self)
+    }
+}

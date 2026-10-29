@@ -1,0 +1,28 @@
+:root {
+  --surface: #f8fafc;
+  --ink: #111827;
+  --text: #334155;
+  --muted: #64748b;
+  --line: #dbe3ea;
+  --ok: #059669;
+  font-family: Avenir Next, Aptos, Segoe UI, sans-serif;
+  color: var(--text);
+  background: var(--surface);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+textarea {
+  font-family: inherit;
+}

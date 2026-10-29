@@ -1,0 +1,57 @@
+.row-actions-menu {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.row-actions-trigger {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.row-actions-trigger:hover,
+.row-actions-trigger[aria-expanded="true"] {
+  border-color: #334155;
+  background: #172235;
+  color: #f1f5f9;
+}
+
+.row-actions-popover {
+  position: fixed;
+  z-index: 1100;
+  min-width: 128px;
+  padding: 5px;
+  border: 1px solid #273449;
+  border-radius: 8px;
+  background: #111827;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.row-actions-popover button {
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #e2e8f0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row-actions-popover button:hover,
+.row-actions-popover button:focus-visible {
+  background: #172235;
+  outline: none;
+}
+
+.row-actions-popover button.danger {
+  color: #fca5a5;
+}

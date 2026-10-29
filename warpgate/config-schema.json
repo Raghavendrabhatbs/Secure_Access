@@ -1,0 +1,856 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WarpgateConfigStore",
+  "type": "object",
+  "properties": {
+    "database_url": {
+      "type": "string",
+      "default": "sqlite:data/db"
+    },
+    "external_host": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "http": {
+      "$ref": "#/$defs/HttpConfig",
+      "default": {
+        "certificate": "",
+        "cookie_max_age": "1day",
+        "external_host": null,
+        "external_port": null,
+        "key": "",
+        "listen": "[::]:8888",
+        "proxy_protocol": false,
+        "session_max_age": "30m",
+        "sni_certificates": [],
+        "trust_x_forwarded_headers": false
+      }
+    },
+    "kubernetes": {
+      "$ref": "#/$defs/KubernetesConfig",
+      "default": {
+        "certificate": "",
+        "enable": false,
+        "external_host": null,
+        "external_port": null,
+        "key": "",
+        "listen": "[::]:8443",
+        "proxy_protocol": false,
+        "session_max_age": "30m"
+      }
+    },
+    "log": {
+      "$ref": "#/$defs/LogConfig",
+      "default": {
+        "audit_retention": "11months 30days 3h 50m 24s",
+        "format": "text",
+        "retention": "7days",
+        "send_to": null
+      }
+    },
+    "mysql": {
+      "$ref": "#/$defs/MySqlConfig",
+      "default": {
+        "advertised_version": "8.0.3-Warpgate",
+        "certificate": "",
+        "enable": false,
+        "external_host": null,
+        "external_port": null,
+        "key": "",
+        "listen": "[::]:33306",
+        "proxy_protocol": false
+      }
+    },
+    "postgres": {
+      "$ref": "#/$defs/PostgresConfig",
+      "default": {
+        "certificate": "",
+        "enable": false,
+        "external_host": null,
+        "external_port": null,
+        "key": "",
+        "listen": "[::]:55432",
+        "proxy_protocol": false
+      }
+    },
+    "rdp": {
+      "$ref": "#/$defs/RdpConfig",
+      "default": {
+        "certificate": "",
+        "enable": false,
+        "external_host": null,
+        "external_port": null,
+        "key": "",
+        "listen": "[::]:3389",
+        "proxy_protocol": false
+      }
+    },
+    "recordings": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RecordingsConfig"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ssh": {
+      "$ref": "#/$defs/SshConfig",
+      "default": {
+        "enable": false,
+        "external_host": null,
+        "external_port": null,
+        "host_key_verification": "prompt",
+        "inactivity_timeout": "5m",
+        "keepalive_interval": null,
+        "keys": "./data/keys",
+        "listen": "[::]:2222",
+        "proxy_protocol": false
+      }
+    },
+    "sso_providers": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SsoProviderConfig"
+      }
+    },
+    "vnc": {
+      "$ref": "#/$defs/VncConfig",
+      "default": {
+        "certificate": "",
+        "enable": false,
+        "enable_ard_auth": false,
+        "external_host": null,
+        "external_port": null,
+        "key": "",
+        "listen": "[::]:5900",
+        "proxy_protocol": false
+      }
+    }
+  },
+  "$defs": {
+    "HttpConfig": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "type": "string",
+          "default": ""
+        },
+        "cookie_max_age": {
+          "type": "string",
+          "default": "1day"
+        },
+        "external_host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "external_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "default": null,
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "key": {
+          "type": "string",
+          "default": ""
+        },
+        "listen": {
+          "$ref": "#/$defs/ListenEndpoint",
+          "default": "[::]:8888"
+        },
+        "proxy_protocol": {
+          "description": "Accept HAProxy PROXY protocol v1/v2 headers from the listener's peer.",
+          "type": "boolean",
+          "default": false
+        },
+        "session_max_age": {
+          "type": "string",
+          "default": "30m"
+        },
+        "sni_certificates": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SniCertificateConfig"
+          }
+        },
+        "trust_x_forwarded_headers": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "KubernetesConfig": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "type": "string",
+          "default": ""
+        },
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "external_host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "external_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "default": null,
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "key": {
+          "type": "string",
+          "default": ""
+        },
+        "listen": {
+          "$ref": "#/$defs/ListenEndpoint",
+          "default": "[::]:8443"
+        },
+        "proxy_protocol": {
+          "description": "Accept HAProxy PROXY protocol v1/v2 headers from the listener's peer.",
+          "type": "boolean",
+          "default": false
+        },
+        "session_max_age": {
+          "type": "string",
+          "default": "30m"
+        }
+      }
+    },
+    "ListenEndpoint": {
+      "type": "string"
+    },
+    "LogConfig": {
+      "type": "object",
+      "properties": {
+        "audit_retention": {
+          "type": "string",
+          "default": "11months 30days 3h 50m 24s"
+        },
+        "format": {
+          "$ref": "#/$defs/LogFormat",
+          "default": "text"
+        },
+        "retention": {
+          "type": "string",
+          "default": "7days"
+        },
+        "send_to": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        }
+      }
+    },
+    "LogFormat": {
+      "type": "string",
+      "enum": [
+        "text",
+        "json"
+      ]
+    },
+    "MySqlConfig": {
+      "type": "object",
+      "properties": {
+        "advertised_version": {
+          "description": "The server version advertised to clients during the handshake.\nWe can't auto-match the target's version since the target is only known\nafter the handshake, but clients use it to pick a protocol dialect.",
+          "type": "string",
+          "default": "8.0.3-Warpgate"
+        },
+        "certificate": {
+          "type": "string",
+          "default": ""
+        },
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "external_host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "external_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "default": null,
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "key": {
+          "type": "string",
+          "default": ""
+        },
+        "listen": {
+          "$ref": "#/$defs/ListenEndpoint",
+          "default": "[::]:33306"
+        },
+        "proxy_protocol": {
+          "description": "Accept HAProxy PROXY protocol v1/v2 headers from the listener's peer.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "PostgresConfig": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "type": "string",
+          "default": ""
+        },
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "external_host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "external_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "default": null,
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "key": {
+          "type": "string",
+          "default": ""
+        },
+        "listen": {
+          "$ref": "#/$defs/ListenEndpoint",
+          "default": "[::]:55432"
+        },
+        "proxy_protocol": {
+          "description": "Accept HAProxy PROXY protocol v1/v2 headers from the listener's peer.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "RdpConfig": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "type": "string",
+          "default": ""
+        },
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "external_host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "external_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "default": null,
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "key": {
+          "type": "string",
+          "default": ""
+        },
+        "listen": {
+          "$ref": "#/$defs/ListenEndpoint",
+          "default": "[::]:3389"
+        },
+        "proxy_protocol": {
+          "description": "Accept HAProxy PROXY protocol v1/v2 headers from the listener's peer.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "RecordingsConfig": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "path": {
+          "type": "string",
+          "default": "./data/recordings"
+        }
+      }
+    },
+    "RoleMapping": {
+      "description": "A role mapping value that accepts either a single role or a list of roles.\nIn YAML config: `\"group\": \"role\"` or `\"group\": [\"role1\", \"role2\"]`",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "SniCertificateConfig": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "certificate",
+        "key"
+      ]
+    },
+    "SshConfig": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "external_host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "external_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "default": null,
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "host_key_verification": {
+          "description": "Only seeds the `ssh_host_key_verification` parameter when the database\nrow is first created; the admin UI owns the setting afterwards.",
+          "$ref": "#/$defs/SshHostKeyVerificationMode",
+          "default": "prompt"
+        },
+        "inactivity_timeout": {
+          "type": "string",
+          "default": "5m"
+        },
+        "keepalive_interval": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "keys": {
+          "type": "string",
+          "default": "./data/keys"
+        },
+        "listen": {
+          "$ref": "#/$defs/ListenEndpoint",
+          "default": "[::]:2222"
+        },
+        "proxy_protocol": {
+          "description": "Accept HAProxy PROXY protocol v1/v2 headers from the listener's peer.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "SshHostKeyVerificationMode": {
+      "type": "string",
+      "enum": [
+        "prompt",
+        "auto_accept",
+        "auto_reject",
+        "ignore"
+      ]
+    },
+    "SsoInternalProviderConfig": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "admin_email": {
+              "description": "A Google Workspace admin email for domain-wide delegation",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "admin_role_mappings": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": {
+                "$ref": "#/$defs/RoleMapping"
+              }
+            },
+            "client_id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "role_mappings": {
+              "description": "Maps Google group email addresses to Warpgate role names.\nUse \"*\" as a key to set a default role for any group not explicitly mapped.",
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": {
+                "$ref": "#/$defs/RoleMapping"
+              }
+            },
+            "service_account_email": {
+              "description": "Service account email for Google Directory API group lookups",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "service_account_key": {
+              "description": "PEM private key from the service account JSON key file",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "google"
+            }
+          },
+          "required": [
+            "type",
+            "client_id",
+            "client_secret"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "key_id": {
+              "type": "string"
+            },
+            "team_id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "apple"
+            }
+          },
+          "required": [
+            "type",
+            "client_id",
+            "client_secret",
+            "key_id",
+            "team_id"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "tenant": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "azure"
+            }
+          },
+          "required": [
+            "type",
+            "client_id",
+            "client_secret",
+            "tenant"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "additional_trusted_audiences": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "admin_role_mappings": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": {
+                "$ref": "#/$defs/RoleMapping"
+              }
+            },
+            "admin_roles_claim": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "client_id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "issuer_url": {
+              "type": "string"
+            },
+            "role_mappings": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": {
+                "$ref": "#/$defs/RoleMapping"
+              }
+            },
+            "roles_claim": {
+              "description": "OIDC claim to read group memberships from (e.g. \"groups\").\nIts values are mapped to roles via role_mappings / admin_role_mappings.\nWhen unset, the warpgate_roles / warpgate_admin_roles claims are used.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "scopes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "trust_unknown_audiences": {
+              "type": "boolean",
+              "default": false
+            },
+            "type": {
+              "type": "string",
+              "const": "custom"
+            }
+          },
+          "required": [
+            "type",
+            "client_id",
+            "client_secret",
+            "issuer_url",
+            "scopes"
+          ]
+        }
+      ]
+    },
+    "SsoProviderConfig": {
+      "type": "object",
+      "properties": {
+        "auto_create_users": {
+          "type": "boolean",
+          "default": false
+        },
+        "default_credential_policy": {
+          "description": "Default credential policy for auto-created users.\nKeys: \"http\", \"ssh\", \"mysql\", \"postgres\"\nValues: list of credential kinds e.g. [\"sso\"], [\"web\"], []"
+        },
+        "kubernetes": {
+          "description": "kubectl OIDC parameters for generating a kubelogin kubeconfig.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SsoProviderKubernetesConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "#/$defs/SsoInternalProviderConfig"
+        },
+        "return_domain_whitelist": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "return_url_domain": {
+          "$ref": "#/$defs/SsoReturnUrlDomainPreference",
+          "default": "external_host"
+        },
+        "return_url_prefix": {
+          "$ref": "#/$defs/SsoProviderReturnUrlPrefix",
+          "default": "@"
+        }
+      },
+      "required": [
+        "name",
+        "provider"
+      ]
+    },
+    "SsoProviderKubernetesConfig": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Public OIDC client id used by kubectl (kubelogin). Must be listed in the\nprovider's `additional_trusted_audiences`.",
+          "type": "string"
+        },
+        "client_secret": {
+          "description": "Optional client secret (only for confidential kubectl clients).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scopes": {
+          "description": "Extra scopes for kubelogin. Defaults to openid/email/profile when unset.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "client_id"
+      ]
+    },
+    "SsoProviderReturnUrlPrefix": {
+      "type": "string",
+      "enum": [
+        "@",
+        "_"
+      ]
+    },
+    "SsoReturnUrlDomainPreference": {
+      "type": "string",
+      "enum": [
+        "external_host",
+        "host_header"
+      ]
+    },
+    "VncConfig": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "type": "string",
+          "default": ""
+        },
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "enable_ard_auth": {
+          "description": "Enable Apple-DH (ARD / type 30) auth. It does not support TLS unlike VeNCrypt",
+          "type": "boolean",
+          "default": false
+        },
+        "external_host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "external_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "default": null,
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "key": {
+          "type": "string",
+          "default": ""
+        },
+        "listen": {
+          "$ref": "#/$defs/ListenEndpoint",
+          "default": "[::]:5900"
+        },
+        "proxy_protocol": {
+          "description": "Accept HAProxy PROXY protocol v1/v2 headers from the listener's peer.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

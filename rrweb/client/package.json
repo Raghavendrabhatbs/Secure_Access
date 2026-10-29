@@ -1,0 +1,22 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@rrweb/record": "^2.1.1",
+    "rrweb-player": "^2.1.1"
+  },
+  "devDependencies": {
+    "vite": "^8.2.2"
+  }
+}

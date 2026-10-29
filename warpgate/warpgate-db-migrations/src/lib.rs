@@ -1,0 +1,249 @@
+use std::fmt::Display;
+
+use sea_orm::DatabaseConnection;
+use sea_orm_migration::MigrationTrait;
+use sea_orm_migration::prelude::*;
+
+mod m00001_create_ticket;
+mod m00002_create_session;
+mod m00003_create_recording;
+mod m00004_create_known_host;
+mod m00005_create_log_entry;
+mod m00006_add_session_protocol;
+mod m00007_targets_and_roles;
+mod m00008_users;
+mod m00009_credential_models;
+mod m00010_parameters;
+mod m00011_rsa_key_algos;
+mod m00012_add_openssh_public_key_label;
+mod m00013_add_openssh_public_key_dates;
+mod m00014_api_tokens;
+mod m00015_fix_public_key_dates;
+mod m00016_fix_public_key_length;
+mod m00017_descriptions;
+mod m00018_ticket_description;
+mod m00019_rate_limits;
+mod m00020_ldap_server;
+mod m00020_target_groups;
+mod m00021_user_ldap_link;
+mod m00023_ldap_username_attribute;
+mod m00024_ssh_key_attribute;
+mod m00025_ldap_uuid_attribute;
+mod m00025_ssh_client_auth;
+mod m00027_ca;
+mod m00028_certificate_credentials;
+mod m00029_certificate_revocation;
+mod m00030_add_recording_metadata;
+mod m00031_minimize_password_login;
+mod m00032_admin_roles;
+mod m00033_add_log_target;
+mod m00034_add_log_related_fields;
+mod m00035_ticket_user_target_id;
+mod m00036_user_role_expiry_history;
+mod m00037_allowed_ip_range;
+mod m00037_database_target_auth;
+mod m00037_show_session_menu;
+mod m00038_fix_target_auth_tags;
+mod m00041_fix_user_role_assignment_dates;
+mod m00042_database_target_auth_again;
+mod m00043_unique_usernames;
+mod m00044_ticket_requests;
+mod m00045_role_default_flag;
+mod m00046_max_api_token_duration;
+mod m00047_record_scp;
+mod m00048_target_click_action;
+mod m00049_text_columns;
+mod m00050_password_policy;
+mod m00051_tutorial_dismissed;
+mod m00052_log_text_column;
+mod m00053_login_protection;
+mod m00054_login_protection_params;
+mod m00055_ssh_banner;
+mod m00056_web_ssh_enabled;
+mod m00057_password_login_mode;
+mod m00058_analytics;
+mod m00059_web_auth_max_age;
+mod m00060_recording_generation;
+mod m00061_rename_web_ssh_enabled;
+mod m00062_web_approval_grace_period;
+mod m00063_recordings_storage;
+mod m00064_cluster;
+mod m00065_authorization_indexes;
+mod m00066_cluster_token;
+mod m00067_node_tls_pin;
+mod m00068_rename_ssh_banner;
+mod m00069_ssh_client_keys;
+mod m00070_http_sessions;
+mod m00071_ssh_host_key_verification;
+mod m00072_session_node_id_not_null;
+mod m00073_redact_session_target_snapshots;
+mod m00074_encryption_key_rotation;
+mod m00075_hash_ticket_and_api_token_secrets;
+mod m00076_open_targets_in_new_tab;
+mod m00077_session_user_target_id;
+mod m00078_assignment_composite_pks;
+mod m00079_unique_target_and_group_names;
+mod m00080_secure_access_user_roles;
+
+pub(crate) mod helpers;
+
+pub struct Migrator;
+
+#[async_trait::async_trait]
+impl MigratorTrait for Migrator {
+    fn migrations() -> Vec<Box<dyn MigrationTrait>> {
+        vec![
+            Box::new(m00001_create_ticket::Migration),
+            Box::new(m00002_create_session::Migration),
+            Box::new(m00003_create_recording::Migration),
+            Box::new(m00004_create_known_host::Migration),
+            Box::new(m00005_create_log_entry::Migration),
+            Box::new(m00006_add_session_protocol::Migration),
+            Box::new(m00007_targets_and_roles::Migration),
+            Box::new(m00008_users::Migration),
+            Box::new(m00009_credential_models::Migration),
+            Box::new(m00010_parameters::Migration),
+            Box::new(m00011_rsa_key_algos::Migration),
+            Box::new(m00012_add_openssh_public_key_label::Migration),
+            Box::new(m00013_add_openssh_public_key_dates::Migration),
+            Box::new(m00014_api_tokens::Migration),
+            Box::new(m00015_fix_public_key_dates::Migration),
+            Box::new(m00016_fix_public_key_length::Migration),
+            Box::new(m00017_descriptions::Migration),
+            Box::new(m00018_ticket_description::Migration),
+            Box::new(m00019_rate_limits::Migration),
+            Box::new(m00020_target_groups::Migration),
+            Box::new(m00020_ldap_server::Migration),
+            Box::new(m00021_user_ldap_link::Migration),
+            Box::new(m00023_ldap_username_attribute::Migration),
+            Box::new(m00024_ssh_key_attribute::Migration),
+            Box::new(m00025_ldap_uuid_attribute::Migration),
+            Box::new(m00025_ssh_client_auth::Migration),
+            Box::new(m00027_ca::Migration),
+            Box::new(m00028_certificate_credentials::Migration),
+            Box::new(m00029_certificate_revocation::Migration),
+            Box::new(m00030_add_recording_metadata::Migration),
+            Box::new(m00031_minimize_password_login::Migration),
+            Box::new(m00032_admin_roles::Migration),
+            Box::new(m00033_add_log_target::Migration),
+            Box::new(m00034_add_log_related_fields::Migration),
+            Box::new(m00035_ticket_user_target_id::Migration),
+            Box::new(m00036_user_role_expiry_history::Migration),
+            Box::new(m00037_database_target_auth::Migration),
+            Box::new(m00038_fix_target_auth_tags::Migration),
+            Box::new(m00037_show_session_menu::Migration),
+            Box::new(m00037_allowed_ip_range::Migration),
+            Box::new(m00041_fix_user_role_assignment_dates::Migration),
+            Box::new(m00042_database_target_auth_again::Migration),
+            Box::new(m00043_unique_usernames::Migration),
+            Box::new(m00044_ticket_requests::Migration),
+            Box::new(m00045_role_default_flag::Migration),
+            Box::new(m00046_max_api_token_duration::Migration),
+            Box::new(m00047_record_scp::Migration),
+            Box::new(m00048_target_click_action::Migration),
+            Box::new(m00049_text_columns::Migration),
+            Box::new(m00050_password_policy::Migration),
+            Box::new(m00051_tutorial_dismissed::Migration),
+            Box::new(m00052_log_text_column::Migration),
+            Box::new(m00053_login_protection::Migration),
+            Box::new(m00054_login_protection_params::Migration),
+            Box::new(m00055_ssh_banner::Migration),
+            Box::new(m00056_web_ssh_enabled::Migration),
+            Box::new(m00057_password_login_mode::Migration),
+            Box::new(m00058_analytics::Migration),
+            Box::new(m00059_web_auth_max_age::Migration),
+            Box::new(m00060_recording_generation::Migration),
+            Box::new(m00061_rename_web_ssh_enabled::Migration),
+            Box::new(m00062_web_approval_grace_period::Migration),
+            Box::new(m00063_recordings_storage::Migration),
+            Box::new(m00064_cluster::Migration),
+            Box::new(m00065_authorization_indexes::Migration),
+            Box::new(m00066_cluster_token::Migration),
+            Box::new(m00067_node_tls_pin::Migration),
+            Box::new(m00068_rename_ssh_banner::Migration),
+            Box::new(m00069_ssh_client_keys::Migration),
+            Box::new(m00070_http_sessions::Migration),
+            Box::new(m00071_ssh_host_key_verification::Migration),
+            Box::new(m00072_session_node_id_not_null::Migration),
+            Box::new(m00073_redact_session_target_snapshots::Migration),
+            Box::new(m00074_encryption_key_rotation::Migration),
+            Box::new(m00075_hash_ticket_and_api_token_secrets::Migration),
+            Box::new(m00076_open_targets_in_new_tab::Migration),
+            Box::new(m00077_session_user_target_id::Migration),
+            Box::new(m00078_assignment_composite_pks::Migration),
+            Box::new(m00079_unique_target_and_group_names::Migration),
+            Box::new(m00080_secure_access_user_roles::Migration),
+        ]
+    }
+}
+
+const MIGRATION_LOCK_KEY: i64 = 0x1337_1337_1337_1337;
+
+async fn run_locked<
+    RF: Future<Output = Result<R, DbErr>> + Send,
+    F: FnOnce() -> RF + Send,
+    R: Send,
+>(
+    connection: &DatabaseConnection,
+    key: impl Display,
+    f: F,
+) -> Result<R, DbErr> {
+    use sea_orm::{ConnectionTrait, DatabaseBackend, Statement, TransactionTrait};
+
+    match connection.get_database_backend() {
+        DatabaseBackend::Postgres => {
+            let lock = connection.begin().await?;
+            // lock is tx scoped
+            lock.execute(Statement::from_string(
+                DatabaseBackend::Postgres,
+                format!("SELECT pg_advisory_xact_lock({key})"),
+            ))
+            .await?;
+            let result = f().await;
+            lock.commit().await?;
+            result
+        }
+        DatabaseBackend::MySql => {
+            let lock = connection.begin().await?;
+            // lock is session scoped
+            lock.execute(Statement::from_string(
+                DatabaseBackend::MySql,
+                format!("SELECT GET_LOCK('warpgate_migration_{key}', -1)"),
+            ))
+            .await?;
+            let result = f().await;
+            let release = lock
+                .execute(Statement::from_string(
+                    DatabaseBackend::MySql,
+                    format!("SELECT RELEASE_LOCK('warpgate_migration_{key}')"),
+                ))
+                .await;
+            lock.commit().await?;
+            release?;
+            result
+        }
+        DatabaseBackend::Sqlite => f().await,
+    }
+}
+
+pub async fn migrate_database(connection: &DatabaseConnection) -> Result<(), DbErr> {
+    run_locked(connection, MIGRATION_LOCK_KEY, async move || {
+        Migrator::up(connection, None).await
+    })
+    .await?;
+
+    Ok(())
+}
+
+/// Apply `steps` pending migrations.
+pub async fn migrate_database_up(connection: &DatabaseConnection, steps: u32) -> Result<(), DbErr> {
+    Migrator::up(connection, Some(steps)).await
+}
+
+/// Revert `steps` applied migrations.
+pub async fn migrate_database_down(
+    connection: &DatabaseConnection,
+    steps: u32,
+) -> Result<(), DbErr> {
+    Migrator::down(connection, Some(steps)).await
+}

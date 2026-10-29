@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>rrweb Replayer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --page-bg: #0f141b;
+      --panel-bg: #171c24;
+      --panel-soft: #1e252f;
+      --panel-hover: #252d38;
+
+      --border: #2e3743;
+      --border-soft: #252c35;
+
+      --text: #f4f6f8;
+      --text-soft: #c5ccd5;
+      --muted: #818b98;
+
+      --blue: #4f8cff;
+      --blue-soft: rgba(79, 140, 255, 0.14);
+
+      --green: #4cc38a;
+      --orange: #e5a34f;
+      --purple: #a679e8;
+      --red: #e46e76;
+      --cyan: #50bfc9;
+
+      --active-event: rgba(79, 140, 255, 0.16);
+    }
+
+    html[data-theme="light"] {
+      --page-bg: #f3f5f8;
+      --panel-bg: #ffffff;
+      --panel-soft: #f5f7f9;
+      --panel-hover: #edf1f5;
+
+      --border: #d8dde4;
+      --border-soft: #e6e9ed;
+
+      --text: #20242a;
+      --text-soft: #4f5762;
+      --muted: #7c8691;
+
+      --blue: #326fd1;
+      --blue-soft: rgba(50, 111, 209, 0.1);
+
+      --green: #28855b;
+      --orange: #a8691f;
+      --purple: #7350a4;
+      --red: #bd4d55;
+      --cyan: #267f88;
+
+      --active-event: rgba(50, 111, 209, 0.11);
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: var(--page-bg);
+      color: var(--text);
+
+      overflow: hidden;
+    }
+
+    button,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      width: 100%;
+      height: 100vh;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------------- HEADER ---------------- */
+
+    .topbar {
+      height: 68px;
+
+      flex: 0 0 auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 24px;
+
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 9px;
+
+      background: #24417a;
+      color: #7caeff;
+
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    html[data-theme="light"] .brand-logo {
+      background: #e6eeff;
+      color: #326fd1;
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+
+      margin-left: auto;
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+    .header-info strong {
+      margin-left: 4px;
+
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .theme-btn {
+      min-width: 68px;
+
+      padding: 7px 11px;
+
+      border: 1px solid var(--border);
+      border-radius: 7px;
+
+      background: var(--panel-soft);
+      color: var(--text-soft);
+
+      cursor: pointer;
+    }
+
+    .theme-btn:hover {
+      background: var(--panel-hover);
+    }
+
+    /* ---------------- SESSION BAR ---------------- */
+
+    .session-bar {
+      height: 54px;
+
+      flex: 0 0 auto;
+
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      padding: 0 20px;
+
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .session-select {
+      width: 430px;
+      height: 36px;
+
+      padding: 0 11px;
+
+      border: 1px solid var(--border);
+      border-radius: 7px;
+
+      background: var(--panel-soft);
+      color: var(--text);
+
+      outline: none;
+    }
+
+    .refresh-btn {
+      height: 36px;
+
+      padding: 0 14px;
+
+      border: 1px solid var(--border);
+      border-radius: 7px;
+
+      background: var(--panel-soft);
+      color: var(--text-soft);
+
+      cursor: pointer;
+    }
+
+    .refresh-btn:hover {
+      background: var(--panel-hover);
+    }
+
+    .session-status {
+      margin-left: auto;
+
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: var(--green);
+    }
+
+    /* ---------------- MAIN LAYOUT ---------------- */
+
+    .content {
+      flex: 1;
+
+      min-height: 0;
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr) 230px;
+    }
+
+    /* ---------------- PLAYER ---------------- */
+
+    .replay-column {
+      min-width: 0;
+      min-height: 0;
+
+      display: flex;
+      flex-direction: column;
+
+      background: var(--panel-bg);
+    }
+
+    .replay-stage {
+      flex: 1;
+
+      min-height: 0;
+
+      position: relative;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      overflow: hidden;
+
+      padding: 14px;
+
+      background: #11161d;
+    }
+
+    html[data-theme="light"] .replay-stage {
+      background: #e8ebef;
+    }
+
+    #player {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    #player .rr-player {
+      margin: 0;
+    }
+
+    .empty-state {
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 12px;
+    }
+
+    /* YouTube-like feedback */
+
+    .center-feedback {
+      position: absolute;
+
+      top: 50%;
+      left: 50%;
+
+      transform:
+        translate(-50%, -50%)
+        scale(0.88);
+
+      min-width: 68px;
+      height: 68px;
+
+      padding: 0 16px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background:
+        rgba(0, 0, 0, 0.68);
+
+      color: white;
+
+      font-size: 21px;
+      font-weight: 700;
+
+      opacity: 0;
+
+      pointer-events: none;
+
+      transition:
+        opacity 140ms ease,
+        transform 140ms ease;
+
+      z-index: 20;
+    }
+
+    .center-feedback.visible {
+      opacity: 1;
+
+      transform:
+        translate(-50%, -50%)
+        scale(1);
+    }
+
+    /* ---------------- FOOTER ---------------- */
+
+    .replay-info {
+      height: 40px;
+
+      flex: 0 0 auto;
+
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      padding: 0 14px;
+
+      background: var(--panel-soft);
+      border-top: 1px solid var(--border);
+
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+    .replay-info strong {
+      margin-left: 4px;
+
+      color: var(--text);
+    }
+
+    .session-id {
+      margin-left: auto;
+    }
+
+    /* ---------------- EVENTS PANEL ---------------- */
+
+    .events-panel {
+      min-height: 0;
+
+      display: flex;
+      flex-direction: column;
+
+      background: var(--panel-bg);
+
+      border-left: 1px solid var(--border);
+    }
+
+    .events-heading {
+      min-height: 54px;
+
+      padding: 11px 10px;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .events-heading-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .events-heading h2 {
+      margin: 0;
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .event-total {
+      padding: 2px 6px;
+
+      border-radius: 999px;
+
+      background: var(--panel-soft);
+      color: var(--muted);
+
+      font-size: 9px;
+    }
+
+    .events-heading p {
+      margin: 3px 0 0;
+
+      color: var(--muted);
+
+      font-size: 8px;
+    }
+
+    .events-list {
+      flex: 1;
+
+      min-height: 0;
+
+      overflow-y: auto;
+
+      scroll-behavior: smooth;
+    }
+
+    .event-row {
+      display: grid;
+
+      grid-template-columns:
+        34px 14px minmax(0, 1fr);
+
+      gap: 5px;
+
+      min-height: 40px;
+
+      padding: 6px 7px;
+
+      align-items: start;
+
+      border-bottom:
+        1px solid var(--border-soft);
+    }
+
+    .event-row:hover {
+      background: var(--panel-hover);
+    }
+
+    .event-row.active {
+      background: var(--active-event);
+
+      box-shadow:
+        inset 3px 0 0 var(--blue);
+    }
+
+    .event-time {
+      padding-top: 1px;
+
+      color: var(--muted);
+
+      font-size: 8px;
+    }
+
+    .event-row.active .event-time {
+      color: var(--blue);
+    }
+
+    .event-symbol {
+      text-align: center;
+      font-size: 9px;
+    }
+
+    .event-content {
+      min-width: 0;
+    }
+
+    .event-title {
+      overflow: hidden;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      color: var(--text-soft);
+
+      font-size: 9px;
+      line-height: 13px;
+    }
+
+    .event-row.active .event-title {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .event-subtitle {
+      overflow: hidden;
+
+      margin-top: 2px;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      color: var(--muted);
+
+      font-size: 7px;
+    }
+
+    .event-click { color: var(--blue); }
+    .event-input { color: var(--green); }
+    .event-scroll { color: var(--orange); }
+    .event-move { color: var(--purple); }
+    .event-dom { color: var(--cyan); }
+    .event-page { color: var(--red); }
+    .event-generic { color: var(--muted); }
+
+    .message {
+      padding: 14px;
+
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .content {
+        grid-template-columns:
+          minmax(0, 1fr) 200px;
+      }
+
+      .header-info span:nth-child(2) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div class="brand-logo">
+        rr
+      </div>
+
+      <div class="brand-name">
+        rrweb Replayer
+      </div>
+
+    </div>
+
+
+    <div class="header-info">
+
+      <span>
+        Session
+        <strong id="header-session">—</strong>
+      </span>
+
+      <span>
+        Date
+        <strong id="header-date">—</strong>
+      </span>
+
+      <span>
+        Duration
+        <strong id="header-duration">—</strong>
+      </span>
+
+      <button
+        id="theme-button"
+        class="theme-btn"
+      >
+        Light
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <div class="session-bar">
+
+    <select
+      id="session-select"
+      class="session-select"
+    >
+      <option value="">
+        Select a recorded session
+      </option>
+    </select>
+
+    <button
+      id="refresh-button"
+      class="refresh-btn"
+    >
+      Refresh
+    </button>
+
+    <div class="session-status">
+      <span class="status-dot"></span>
+      Recorder backend
+    </div>
+
+  </div>
+
+
+  <div class="content">
+
+    <section class="replay-column">
+
+      <div
+        id="replay-stage"
+        class="replay-stage"
+      >
+
+        <div
+          id="empty-state"
+          class="empty-state"
+        >
+          Select a recording above to begin replay.
+        </div>
+
+        <div id="player"></div>
+
+        <div
+          id="center-feedback"
+          class="center-feedback"
+        ></div>
+
+      </div>
+
+
+      <footer class="replay-info">
+
+        <span>
+          Events
+          <strong id="event-count">—</strong>
+        </span>
+
+        <span>
+          Current
+          <strong id="current-time">00:00</strong>
+        </span>
+
+        <span>
+          Duration
+          <strong id="footer-duration">—</strong>
+        </span>
+
+        <span class="session-id">
+          ID
+          <strong id="session-id">—</strong>
+        </span>
+
+      </footer>
+
+    </section>
+
+
+    <aside class="events-panel">
+
+      <div class="events-heading">
+
+        <div class="events-heading-row">
+
+          <h2>
+            Browser Events
+          </h2>
+
+          <span
+            id="event-total"
+            class="event-total"
+          >
+            0
+          </span>
+
+        </div>
+
+        <p>
+          Live replay timeline
+        </p>
+
+      </div>
+
+
+      <div
+        id="events-list"
+        class="events-list"
+      >
+
+        <div class="message">
+          Select a session.
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+</div>
+
+
+<script
+  type="module"
+  src="/src/player.js"
+></script>
+
+</body>
+</html>

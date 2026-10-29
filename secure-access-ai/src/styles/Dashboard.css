@@ -1,0 +1,509 @@
+/* =========================================
+   DASHBOARD SHELL
+========================================= */
+
+.dashboard-layout {
+  min-height: 100vh;
+
+  display: flex;
+
+  background: #f1f4f7;
+}
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.sidebar {
+  width: 220px;
+  height: 100vh;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 30;
+
+  padding: 16px 10px 14px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #0c1b2b;
+  color: #ffffff;
+}
+
+
+/* BRAND */
+
+.sidebar-brand {
+  height: 44px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.15px;
+}
+
+.sidebar-brand svg {
+  color: #6c94e8;
+}
+
+
+/* NAVIGATION */
+
+.sidebar-nav {
+  flex: 1;
+
+  margin-top: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  overflow-y: auto;
+
+  scrollbar-width: none;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* SECTION */
+
+.sidebar-section {
+  margin-top: 17px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-section-title {
+  margin: 0 0 6px 10px;
+
+  color: #7f8da1;
+
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 600;
+
+  letter-spacing: 0.65px;
+}
+
+
+/* LINKS */
+
+.sidebar-link {
+  width: 100%;
+  height: 37px;
+
+  padding: 0 10px;
+
+  border: none;
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #bcc6d2;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  text-align: left;
+}
+
+.sidebar-link svg {
+  flex: 0 0 auto;
+
+  color: #9dadbd;
+}
+
+.sidebar-link:hover {
+  background: #15283b;
+  color: #ffffff;
+}
+
+.sidebar-link:hover svg {
+  color: #ffffff;
+}
+
+.sidebar-link.active {
+  background: #213a54;
+
+  color: #ffffff;
+
+  font-weight: 500;
+}
+
+.sidebar-link.active svg {
+  color: #ffffff;
+}
+
+
+/* SETTINGS */
+
+.sidebar-bottom {
+  padding-top: 9px;
+
+  border-top: 1px solid #203344;
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+.dashboard-main {
+  width: calc(100% - 220px);
+
+  min-width: 0;
+  min-height: 100vh;
+
+  margin-left: 220px;
+}
+
+
+/* =========================================
+   TOP BAR
+========================================= */
+
+.topbar {
+  height: 54px;
+
+  padding: 0 20px;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #dfe4e9;
+}
+
+
+/* PAGE NAME */
+
+.topbar-page-name {
+  color: #202b3c;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+/* RIGHT AREA */
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+
+/* PROFILE */
+
+.profile-button {
+  height: 30px;
+
+  padding: 0 9px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  border: none;
+  border-radius: 15px;
+
+  background: #eef2f6;
+
+  color: #202b3c;
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.profile-button:hover {
+  background: #e6ebf0;
+}
+
+.logout-button {
+  height: 30px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--sai-border);
+  border-radius: 7px;
+  background: #111827;
+  color: var(--sai-text);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.logout-button:hover:not(:disabled) {
+  background: #263449;
+}
+
+.logout-button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.logout-error {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 12px;
+  z-index: 2;
+  padding: 6px 9px;
+  border: 1px solid #7f1d1d;
+  border-radius: 5px;
+  background: #450a0a;
+  color: #fecaca;
+  font-size: 11px;
+}
+
+.topbar {
+  position: relative;
+}
+
+.logout-button:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 2px;
+}
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.dashboard-content {
+  width: 100%;
+
+  padding: 18px 20px 34px;
+
+  /*
+    Important:
+    no fixed height.
+    Page can naturally scroll vertically.
+  */
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+  .sidebar {
+    width: 68px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .sidebar-brand {
+    justify-content: center;
+
+    padding: 0;
+  }
+
+  .sidebar-brand span,
+  .sidebar-section-title,
+  .sidebar-link span {
+    display: none;
+  }
+
+  .sidebar-link {
+    justify-content: center;
+    
+
+    padding: 0;
+  }
+
+  .dashboard-main {
+    width: calc(100% - 68px);
+    margin-left: 68px;
+  }
+}
+
+
+@media (max-width: 620px) {
+  .dashboard-content {
+    padding: 15px 12px 28px;
+  }
+
+}
+
+/* =========================================
+   SECURE ACCESS AI — GLOBAL DARK THEME
+========================================= */
+
+:root {
+  color-scheme: dark;
+  --sai-bg: #0b1020;
+  --sai-surface: #111827;
+  --sai-border: #273449;
+  --sai-text: #f1f5f9;
+  --sai-muted: #94a3b8;
+  --sai-purple: #8b5cf6;
+}
+
+.dashboard-layout {
+  background: var(--sai-bg);
+  color: var(--sai-text);
+}
+
+.sidebar {
+  background: #0d1324;
+  border-right: 1px solid var(--sai-border);
+  color: var(--sai-text);
+}
+
+.sidebar-brand {
+  color: #f8fafc;
+  font-weight: 650;
+}
+
+.sidebar-brand svg {
+  color: #a78bfa;
+}
+
+.sidebar-section-title {
+  color: #8290a5;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+
+.sidebar-link {
+  color: #aab6c9;
+  border-radius: 7px;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.sidebar-link svg {
+  color: #94a3b8;
+}
+
+.sidebar-link:hover {
+  background: #19233a;
+  color: #ffffff;
+}
+
+.sidebar-link.active {
+  background: rgba(139, 92, 246, 0.18);
+  color: #c4b5fd;
+  box-shadow: inset 3px 0 0 #8b5cf6;
+}
+
+.sidebar-link.active svg {
+  color: #a78bfa;
+}
+
+.sidebar-bottom {
+  border-top-color: var(--sai-border);
+}
+
+.dashboard-main,
+.dashboard-content {
+  background: var(--sai-bg);
+  color: var(--sai-text);
+}
+
+.topbar {
+  background: #0d1324;
+  border-bottom: 1px solid var(--sai-border);
+}
+
+.topbar-page-name {
+  color: #f1f5f9;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profile-button {
+  background: #1b2540;
+  color: #e2e8f0;
+}
+
+.profile-button:hover {
+  background: #263449;
+}
+
+.sidebar-link:focus-visible,
+.profile-button:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .sidebar-link.active {
+    box-shadow: inset 0 -3px 0 #8b5cf6;
+  }
+}
+
+/* =========================================
+   SECURE ACCESS AI — TOPBAR BRANDING
+========================================= */
+
+.topbar-page-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #f1f5f9;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.topbar-page-name > span:first-of-type {
+  color: #c4b5fd;
+}
+
+.topbar-divider {
+  color: #475569;
+  font-weight: 400;
+}
+
+.topbar-current-page {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+@media (max-width: 620px) {
+  .topbar-page-name {
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .topbar-page-name > svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .topbar-current-page,
+  .topbar-divider {
+    display: none;
+  }
+}

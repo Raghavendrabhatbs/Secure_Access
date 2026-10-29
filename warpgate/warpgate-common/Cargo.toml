@@ -1,0 +1,66 @@
+[package]
+name = "warpgate-common"
+version = "0.28.0-beta.1"
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+[[bin]]
+name = "config-schema"
+path = "src/config_schema.rs"
+
+[dependencies]
+aes-gcm.workspace = true
+anyhow.workspace = true
+argon2.workspace = true
+async-trait.workspace = true
+bytes.workspace = true
+clap = { version = "4.0", features = [
+    "derive",
+    "std",
+], default-features = false }
+data-encoding.workspace = true
+delegate.workspace = true
+futures.workspace = true
+git-version = { version = "0.3.9", default-features = false }
+governor.workspace = true
+humantime-serde = { version = "1.1", default-features = false }
+ipnet.workspace = true
+password-hash.workspace = true
+poem.workspace = true
+poem-openapi.workspace = true
+ppp.workspace = true
+rand.workspace = true
+rand_chacha.workspace = true
+rand_core.workspace = true
+rcgen.workspace = true
+reqwest = { workspace = true, features = ["json"] }
+reqwest-websocket.workspace = true
+russh.workspace = true
+rustls.workspace = true
+rustls-native-certs = { version = "0.8", default-features = false }
+rustls-pki-types.workspace = true
+schemars.workspace = true
+sea-orm.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+strum = { version = "0.28", features = ["derive"] }
+thiserror.workspace = true
+time.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+tokio-stream.workspace = true
+tokio-tungstenite.workspace = true
+totp-rs = { version = "5.0", features = ["otpauth"], default-features = false }
+tracing.workspace = true
+tracing-core = { version = "0.1", default-features = false }
+url.workspace = true
+uuid.workspace = true
+warpgate-aws = { path = "../warpgate-aws" }
+warpgate-ca = { path = "../warpgate-ca" }
+warpgate-ldap = { path = "../warpgate-ldap" }
+warpgate-sso = { path = "../warpgate-sso" }
+warpgate-tls = { path = "../warpgate-tls" }
+webpki = { version = "0.22", default-features = false }
+x509-parser = { version = "0.18.1", default-features = false }

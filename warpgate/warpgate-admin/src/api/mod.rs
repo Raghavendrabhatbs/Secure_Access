@@ -1,0 +1,90 @@
+use poem_openapi::OpenApi;
+
+mod admin_roles;
+mod certificate_credentials;
+pub mod cluster_proxy;
+// The per-permission `require` gate, `PermissionGranted`, and the cluster variant are consumed
+// by the Stage 3 endpoint migration; until every handler is moved onto these, parts of the
+// module are intentionally unused.
+#[allow(dead_code)]
+mod admin_scheme;
+mod common;
+pub(crate) use admin_scheme::{AdminContext, AuthenticatedContext, ClusterOrAdminContext};
+pub use common::admin_permission_set;
+mod known_hosts_detail;
+mod known_hosts_list;
+mod ldap_servers;
+mod login_protection;
+mod logs;
+mod network_status;
+mod otp_credentials;
+mod pagination;
+mod parameters;
+mod password_credentials;
+mod public_key_credentials;
+pub mod recordings_detail;
+mod roles;
+mod sessions_detail;
+pub mod sessions_list;
+mod ssh_connection_test;
+mod ssh_keys;
+mod sso_credentials;
+mod target_groups;
+mod targets;
+mod ticket_requests_detail;
+mod ticket_requests_list;
+mod tickets_detail;
+mod tickets_list;
+pub mod users;
+
+pub use warpgate_common::api::AnySecurityScheme;
+
+pub fn get() -> impl OpenApi {
+    // The arrangement of brackets here is simply due to
+    // the limited number of `impl OpenApi for (T1, T2, ...)` overloads
+    // and has no semantic meaning
+    (
+        (
+            (sessions_list::Api, sessions_detail::Api),
+            recordings_detail::Api,
+            (roles::ListApi, roles::DetailApi),
+            (admin_roles::ListApi, admin_roles::DetailApi),
+            (tickets_list::Api, tickets_detail::Api),
+            (ticket_requests_list::Api, ticket_requests_detail::Api),
+            (known_hosts_list::Api, known_hosts_detail::Api),
+            ssh_keys::Api,
+            logs::Api,
+            (targets::ListApi, targets::DetailApi, targets::RolesApi),
+            (target_groups::ListApi, target_groups::DetailApi),
+            (users::ListApi, users::DetailApi, users::RolesApi),
+            (
+                password_credentials::ListApi,
+                password_credentials::DetailApi,
+            ),
+        ),
+        (
+            (sso_credentials::ListApi, sso_credentials::DetailApi),
+            (
+                public_key_credentials::ListApi,
+                public_key_credentials::DetailApi,
+            ),
+            (otp_credentials::ListApi, otp_credentials::DetailApi),
+            (
+                ldap_servers::ListApi,
+                ldap_servers::DetailApi,
+                ldap_servers::QueryApi,
+                ldap_servers::ImportApi,
+            ),
+            parameters::Api,
+            (
+                ssh_connection_test::Api,
+                login_protection::Api,
+                network_status::Api,
+            ),
+        ),
+        (
+            certificate_credentials::ListApi,
+            certificate_credentials::DetailApi,
+        ),
+    )
+}

@@ -1,0 +1,56 @@
+[package]
+name = "warpgate-protocol-http"
+version = "0.28.0-beta.1"
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+[dependencies]
+sha2 = "0.11"
+hmac = "0.13"
+base64 = "0.22"
+getrandom = "0.3"
+libc = "0.2"
+anyhow.workspace = true
+async-trait.workspace = true
+cookie = { version = "0.18", default-features = false }
+data-encoding.workspace = true
+delegate.workspace = true
+futures.workspace = true
+html-escape.workspace = true
+http.workspace = true
+percent-encoding = { version = "2.1", default-features = false }
+poem.workspace = true
+poem-openapi.workspace = true
+regex.workspace = true
+reqwest = { workspace = true, features = ["json"] }
+sea-orm.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+subtle.workspace = true
+time.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+tracing.workspace = true
+url.workspace = true
+uuid.workspace = true
+warpgate-admin = { path = "../warpgate-admin", default-features = false }
+warpgate-aws = { path = "../warpgate-aws", default-features = false }
+warpgate-ca = { path = "../warpgate-ca", default-features = false }
+warpgate-common = { path = "../warpgate-common", default-features = false }
+warpgate-common-http = { path = "../warpgate-common-http", default-features = false }
+warpgate-core = { path = "../warpgate-core", default-features = false }
+warpgate-db-entities = { path = "../warpgate-db-entities", default-features = false }
+warpgate-sso = { path = "../warpgate-sso", default-features = false }
+warpgate-tls = { path = "../warpgate-tls", default-features = false }
+warpgate-web = { path = "../warpgate-web", default-features = false }
+warpgate-web-desktop = { path = "../warpgate-web-desktop", default-features = false }
+warpgate-web-ssh = { path = "../warpgate-web-ssh", default-features = false }
+
+[dev-dependencies]
+poem = { workspace = true, features = ["test"] }
+rustls = { workspace = true, features = ["aws_lc_rs"] }
+sea-orm = { workspace = true, features = ["sqlx-sqlite"] }
+warpgate-db-migrations = { path = "../warpgate-db-migrations", features = [
+    "sqlite",
+] }

@@ -1,0 +1,414 @@
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #ffffff;
+}
+
+.login-error {
+  margin-top: 14px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+/* LEFT PANEL */
+
+.login-left {
+  min-height: 100vh;
+  background: #0d1b2a;
+  color: #ffffff;
+  padding: 58px 64px;
+  display: flex;
+  flex-direction: column;
+}
+
+.left-brand,
+.right-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 700;
+}
+
+.left-brand {
+  font-size: 25px;
+}
+
+.left-content {
+  margin-top: 78px;
+  max-width: 530px;
+}
+
+.left-content h1 {
+  font-size: 52px;
+  line-height: 1.08;
+  letter-spacing: -1.8px;
+  font-weight: 700;
+}
+
+.left-description {
+  margin-top: 25px;
+  max-width: 490px;
+  color: #aab6c4;
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.feature-list {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  color: #e7edf5;
+  font-size: 18px;
+}
+
+.feature-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 7px;
+  background: #182b3e;
+  color: #aebdcc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* RIGHT PANEL */
+
+.login-right {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #ffffff;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 440px;
+}
+
+.right-brand {
+  justify-content: center;
+  color: #0d1b2a;
+  font-size: 26px;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-top: 45px;
+}
+
+.welcome-section h2 {
+  color: #111827;
+  font-size: 38px;
+  letter-spacing: -1.2px;
+  font-weight: 700;
+}
+
+.welcome-section p {
+  margin-top: 9px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.login-form {
+  margin-top: 48px;
+}
+
+.form-input {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #d5d9df;
+  border-radius: 7px;
+  background: #ffffff;
+  padding: 0 15px;
+  font-size: 15px;
+  color: #111827;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.form-input:focus {
+  border-color: #4d7fe9;
+  box-shadow: 0 0 0 3px rgba(77, 127, 233, 0.12);
+}
+
+.password-container {
+  position: relative;
+  margin-top: 14px;
+}
+
+.password-container .form-input {
+  padding-right: 50px;
+}
+
+.password-button {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #687586;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-options {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.remember-me input {
+  width: 16px;
+  height: 16px;
+  accent-color: #356ee8;
+}
+
+.forgot-password {
+  border: none;
+  background: transparent;
+  color: #49677e;
+  font-size: 14px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.sign-in-button {
+  width: 100%;
+  height: 51px;
+  margin-top: 27px;
+  border: none;
+  border-radius: 7px;
+  background: #336fe9;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+}
+
+.sign-in-button:hover {
+  background: #2862d6;
+}
+
+.sign-in-button:active {
+  transform: translateY(1px);
+}
+
+.divider {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.divider span {
+  height: 1px;
+  flex: 1;
+  background: #e2e5e9;
+}
+
+.divider p {
+  color: #8a929e;
+  font-size: 14px;
+}
+
+.sso-button {
+  width: 100%;
+  height: 51px;
+  border: 1px solid #d5d9df;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #202834;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.sso-button:hover {
+  background: #f7f8fa;
+}
+
+.login-footer {
+  position: absolute;
+  bottom: 30px;
+  color: #7b8490;
+  font-size: 13px;
+}
+
+
+/* RESPONSIVE */
+
+/* Large tablets / smaller laptops */
+@media (max-width: 1200px) {
+  .login-left {
+    padding: 48px 42px;
+  }
+
+  .left-content {
+    margin-top: 60px;
+  }
+
+  .left-content h1 {
+    font-size: 44px;
+  }
+
+  .left-description {
+    font-size: 16px;
+  }
+
+  .feature-item {
+    font-size: 16px;
+  }
+
+  .login-right {
+    padding: 32px;
+  }
+
+  .login-container {
+    max-width: 410px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    min-height: 100vh;
+    padding: 40px 28px;
+  }
+
+  .login-container {
+    max-width: 460px;
+  }
+
+  .welcome-section h2 {
+    font-size: 36px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .login-right {
+    padding: 28px 20px 70px;
+    align-items: flex-start;
+  }
+
+  .login-container {
+    margin-top: 35px;
+    max-width: 100%;
+  }
+
+  .right-brand {
+    font-size: 23px;
+  }
+
+  .welcome-section {
+    margin-top: 36px;
+  }
+
+  .welcome-section h2 {
+    font-size: 31px;
+  }
+
+  .welcome-section p {
+    font-size: 14px;
+  }
+
+  .login-form {
+    margin-top: 36px;
+  }
+
+  .form-input,
+  .sign-in-button,
+  .sso-button {
+    height: 50px;
+  }
+
+  .login-options {
+    gap: 12px;
+  }
+
+  .remember-me,
+  .forgot-password {
+    font-size: 13px;
+  }
+
+  .login-footer {
+    width: 100%;
+    left: 0;
+    bottom: 18px;
+    text-align: center;
+    font-size: 12px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 400px) {
+  .login-right {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .right-brand {
+    font-size: 21px;
+  }
+
+  .welcome-section h2 {
+    font-size: 28px;
+  }
+
+  .login-options {
+    align-items: flex-start;
+  }
+}

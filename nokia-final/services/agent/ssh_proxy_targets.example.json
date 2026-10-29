@@ -1,0 +1,10 @@
+{
+  "targets": [
+    {
+      "name": "ssh-demo",
+      "host": "127.0.0.1",
+      "port": 22,
+      "listen_port": 2224
+    }
+  ]
+}

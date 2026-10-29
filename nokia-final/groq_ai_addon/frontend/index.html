@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Secure Access | Optional Groq AI</title>
+    <link rel="stylesheet" href="/secret-ai.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">STANDALONE ADDON</p>
+          <h1>Secure Access Assistant</h1>
+        </div>
+        <button id="mode-toggle" class="mode-toggle" type="button" aria-pressed="true"
+          aria-label="Toggle the standalone Groq AI mode" title="Switch between this addon and its integration note">
+          <span class="status-dot" aria-hidden="true"></span>
+          Groq AI mode <span id="mode-state">On</span>
+        </button>
+      </header>
+      <section id="chat-view" class="panel" aria-label="Groq AI chat">
+        <div class="notice">
+          Optional standalone mode. Answers about real activity are retrieved from authenticated
+          Secure Access sources before Groq is called.
+        </div>
+        <div id="messages" class="messages" aria-live="polite">
+          <article class="message assistant">
+            <strong>Groq AI</strong>
+            <p>Ask about recorded sessions, commands, events, recordings, or configured incident alerts.</p>
+          </article>
+        </div>
+        <p id="error" class="error" role="alert" hidden></p>
+        <form id="chat-form" class="composer">
+          <label for="message-input">Ask about Secure Access</label>
+          <div class="composer-row">
+            <textarea id="message-input" name="message" rows="2" maxlength="4000" required
+              placeholder="For example: list today's SSH and Web sessions"></textarea>
+            <button id="send-button" type="submit">Send</button>
+          </div>
+          <small>Your browser login is required. Never paste passwords, tokens, or private keys.</small>
+        </form>
+      </section>
+      <section id="normal-view" class="panel" hidden>
+        <h2>Standalone addon boundary</h2>
+        <p>This addon is not wired into the existing Secure Access interface. Use the integration guide to connect it only after approval.</p>
+        <a href="/docs" target="_blank" rel="noopener noreferrer">Open the addon API documentation</a>
+      </section>
+    </main>
+    <script src="/secret-ai.js" defer></script>
+  </body>
+</html>

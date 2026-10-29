@@ -1,0 +1,255 @@
+<script lang="ts">
+    import { faGithub } from '@fortawesome/free-brands-svg-icons'
+    import { faBriefcase } from '@fortawesome/free-solid-svg-icons'
+    import { Alert } from '@sveltestrap/sveltestrap'
+    import AuthBar from 'common/AuthBar.svelte'
+    import Brand from 'common/Brand.svelte'
+    import Loadable from 'common/Loadable.svelte'
+    import Redirect from 'common/Redirect.svelte'
+    import ThemeSwitcher from 'common/ThemeSwitcher.svelte'
+    import { reloadServerInfo, serverInfo } from 'gateway/lib/store'
+    import snarkdown from 'snarkdown'
+    import { get } from 'svelte/store'
+    import Fa from 'svelte-fa'
+    import Router, {
+        link,
+        router,
+        type WrappedComponent,
+    } from 'svelte-spa-router'
+    import active from 'svelte-spa-router/active'
+    import { wrap } from 'svelte-spa-router/wrap'
+    import AnalyticsConsentModal from './AnalyticsConsentModal.svelte'
+
+    let showAnalyticsModal = $state(false)
+    $effect(() => {
+        if (
+            ($serverInfo?.shouldPromptAnalytics ?? false) &&
+            $serverInfo?.adminPermissions?.configEdit
+        ) {
+            setTimeout(() => {
+                showAnalyticsModal = true
+            }, 1000)
+        }
+    })
+
+    async function init() {
+        await reloadServerInfo()
+        if (!get(serverInfo)?.username) {
+            // Not logged in: redirect to the (gateway) login page, preserving this admin
+            // URL — hash route included — as `next` so we return exactly here afterwards.
+            // (The admin shell is no longer server-gated, so this runs client-side where
+            // the SPA hash route is known.)
+            const next = location.pathname + location.hash
+            location.assign(
+                `/@warpgate#/login?next=${encodeURIComponent(next)}`,
+            )
+        }
+    }
+
+    const initPromise = init()
+
+    const routes: Record<string, WrappedComponent> = {
+        '/': wrap({
+            component: Redirect,
+            props: { to: '/status/sessions' },
+        }),
+        '/status/recordings/:id': wrap({
+            asyncComponent: () => import('./status/Recording.svelte'),
+        }),
+        '/status/recordings/:id/watch': wrap({
+            asyncComponent: () => import('./status/Recording.svelte'),
+            props: { watchMode: true },
+        }),
+        '/status': wrap({
+            asyncComponent: () => import('./status/Status.svelte'),
+        }),
+        '/log': wrap({
+            asyncComponent: () => import('./Log.svelte'),
+        }),
+        '/log/user/:id': wrap({
+            asyncComponent: () => import('./Log.svelte'),
+            props: {
+                filterKind: 'user',
+            },
+        }),
+        '/log/access-role/:id': wrap({
+            asyncComponent: () => import('./Log.svelte'),
+            props: {
+                filterKind: 'access-role',
+            },
+        }),
+        '/log/admin-role/:id': wrap({
+            asyncComponent: () => import('./Log.svelte'),
+            props: {
+                filterKind: 'admin-role',
+            },
+        }),
+        '/config': wrap({
+            asyncComponent: () => import('./config/Config.svelte'),
+        }),
+    }
+    // biome-ignore lint/style/noNonNullAssertion: x
+    routes['/config/*'] = routes['/config']!
+    // biome-ignore lint/style/noNonNullAssertion: x
+    routes['/status/*'] = routes['/status']!
+
+    const wideMode = $derived(router.location.startsWith('/log'))
+    const recordingView = $derived(
+        router.location.startsWith('/status/recordings/'),
+    )
+
+    const warningsHtml = $derived(
+        $serverInfo?.configWarnings?.map(x => snarkdown(x)),
+    )
+</script>
+
+<Loadable promise={initPromise}>
+    <div
+        class="app"
+        class:container-lg={!wideMode}
+        class:container-max={wideMode}
+        class:recording-view={recordingView}
+    >
+        <header>
+            <a href="/@warpgate" class="d-flex logo-link me-4">
+                <Brand />
+            </a>
+            {#if $serverInfo?.username}
+                <a
+                    use:link
+                    use:active={{path: /^\/status\//}}
+                    href="/status/sessions"
+                >
+                    Status
+                </a>
+                <a
+                    use:link
+                    use:active
+                    use:active={{path: /^\/config\//}}
+                    href="/config"
+                >
+                    Config
+                </a>
+                <a use:link use:active href="/log">Log</a>
+            {/if}
+            <span class="ms-3"></span>
+            <div class="ms-auto">
+                <AuthBar />
+            </div>
+        </header>
+        <main>
+            {#if warningsHtml?.length}
+                <Alert color="warning" fade={false}>
+                    <strong>Issues found:</strong>
+                    <ul class="mb-0 mt-2">
+                        {#each warningsHtml as warning (warning)}
+                            <li>{@html warning}</li>
+                        {/each}
+                    </ul>
+                </Alert>
+            {/if}
+            <Router {routes} />
+        </main>
+
+        <footer class="d-flex mt-5 gap-3">
+            <div>
+                {$serverInfo?.version}
+            </div>
+            &middot;
+            <div class="d-flex align-items-center gap-2">
+                <Fa icon={faGithub} class="text-muted" />
+                <a target="_blank" href="https://github.com/warp-tech/warpgate">
+                    GitHub
+                </a>
+            </div>
+            &middot;
+            <div class="d-flex align-items-center gap-2">
+                <Fa icon={faBriefcase} class="text-muted" />
+                <a
+                    target="_blank"
+                    href="https://warpgate.null.page/for-business/"
+                >
+                    Professional support
+                </a>
+            </div>
+            <div class="me-auto"></div>
+            <ThemeSwitcher />
+        </footer>
+    </div>
+</Loadable>
+
+{#if showAnalyticsModal}
+    <AnalyticsConsentModal bind:isOpen={showAnalyticsModal} />
+{/if}
+
+<style lang="scss">
+    @media (max-width: 767px) {
+        .logo-link {
+            display: none !important;
+        }
+    }
+
+    .app {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+
+        &.container-max {
+            margin: 0 30px;
+        }
+    }
+
+    .app.recording-view {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: clamp(16px, 3vw, 40px);
+        background:
+            radial-gradient(
+                circle at 15% 0%,
+                rgba(59, 130, 246, 0.22),
+                transparent 36rem
+            ),
+            linear-gradient(145deg, #0b1020 0%, #101a2c 52%, #0c1b2b 100%);
+        color: #f1f5f9;
+
+        header,
+        footer {
+            display: none;
+        }
+
+        main {
+            width: 100%;
+            max-width: 1440px;
+            min-height: calc(100vh - 2 * clamp(16px, 3vw, 40px));
+            margin: 0 auto;
+        }
+
+        :global(.page-summary-bar) {
+            color: #f1f5f9;
+        }
+    }
+
+    header, footer {
+        flex: none;
+    }
+
+    main {
+        flex: 1 0 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        display: flex;
+        align-items: center;
+        padding: 7px 0;
+        margin: 10px 0 20px;
+
+        a {
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+    }
+</style>

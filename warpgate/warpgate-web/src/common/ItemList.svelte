@@ -1,0 +1,171 @@
+<script lang="ts" module>
+    export interface LoadOptions {
+        search?: string
+        offset: number
+        limit?: number
+    }
+
+    export interface PaginatedResponse<T> {
+        items: T[]
+        offset: number
+        total: number
+    }
+</script>
+
+<script lang="ts" generics="T, G = unknown, GK = unknown">
+    import { Input } from '@sveltestrap/sveltestrap'
+    import {
+        combineLatest,
+        debounceTime,
+        distinctUntilChanged,
+        map,
+        type Observable,
+        Subject,
+        share,
+        switchMap,
+        tap,
+    } from 'rxjs'
+    import { onDestroy, onMount, type Snippet } from 'svelte'
+    import { observe } from 'svelte-observable'
+    import DelayedSpinner from './DelayedSpinner.svelte'
+    import EmptyState from './EmptyState.svelte'
+    import Pagination from './Pagination.svelte'
+
+    interface Props {
+        page?: number
+        pageSize?: number | undefined
+        load: (_: LoadOptions) => Observable<PaginatedResponse<T>>
+        groupObject?: (_: T) => G
+        groupKey?: (_: G) => GK
+        showSearch?: boolean
+        header?: Snippet<[T[] | null]>
+        item?: Snippet<[T]>
+        footer?: Snippet<[T[]]>
+        empty?: Snippet<[]>
+        groupHeader?: Snippet<[G]>
+    }
+
+    let {
+        page = $bindable(0),
+        pageSize = undefined,
+        load,
+        showSearch = false,
+        groupObject,
+        groupKey,
+        header,
+        item,
+        footer,
+        empty,
+        groupHeader,
+    }: Props = $props()
+
+    let filter = $state('')
+    let loaded = $state(false)
+
+    const page$ = new Subject<number>()
+    const filter$ = new Subject<string>()
+
+    const responses = combineLatest([
+        page$,
+        filter$.pipe(
+            tap(() => {
+                loaded = false
+            }),
+            debounceTime(200),
+        ),
+    ]).pipe(
+        distinctUntilChanged(),
+        switchMap(([p, f]) => {
+            page = p
+            loaded = false
+            return load({
+                search: f,
+                offset: p * (pageSize ?? 0),
+                limit: pageSize,
+            })
+        }),
+        share(),
+        tap(() => {
+            loaded = true
+        }),
+    )
+
+    const total = observe<number>(responses.pipe(map(x => x.total)), 0)
+    const items = observe<T[] | null>(responses.pipe(map(x => x.items)), null)
+
+    onMount(() => {
+        if (groupHeader && (!groupObject || !groupKey)) {
+            throw new Error(
+                'groupObject and groupKey must be provided when using groupHeader',
+            )
+        }
+    })
+
+    onDestroy(() => {
+        page$.complete()
+        filter$.complete()
+    })
+
+    $effect(() => {
+        page$.next(page)
+    })
+    $effect(() => {
+        filter$.next(filter)
+    })
+
+    filter$.subscribe(() => {
+        page = 0
+    })
+</script>
+
+{#await $items}
+    <DelayedSpinner />
+{:then _items}
+    <div class="d-flex align-items-center mb-2" hidden={!loaded}>
+        <!-- either filtering or not filtering and there are at least some items at all -->
+        {#if showSearch && (filter || !!_items?.length)}
+            <Input
+                bind:value={filter}
+                placeholder="Search..."
+                class="flex-grow-1"
+            />
+        {/if}
+        {@render header?.(_items)}
+    </div>
+    {#if _items}
+        <div class="list-group list-group-flush mb-3">
+            {#each _items as _item, _index (_item)}
+                {#if groupHeader && groupObject && groupKey}
+                    {@const prev = _items[_index - 1]}
+                    {#if _index === 0 || (prev && groupKey(groupObject(_item)) !== groupKey(groupObject(prev)))}
+                        {@render groupHeader(groupObject(_item))}
+                    {/if}
+                {/if}
+                {@render item?.(_item)}
+            {/each}
+        </div>
+        {@render footer?.(_items)}
+    {:else}
+        <DelayedSpinner />
+    {/if}
+
+    {#if loaded && !_items?.length}
+        {#if filter}
+            <EmptyState title="Nothing found" />
+        {:else}
+            {@render empty?.()}
+        {/if}
+    {/if}
+{/await}
+
+{#await $total then _total}
+    {#if pageSize && _total > pageSize}
+        <Pagination total={_total} bind:page {pageSize} />
+    {/if}
+{/await}
+
+<style lang="scss">
+    .list-group:empty {
+        display: none;
+    }
+</style>

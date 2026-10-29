@@ -1,0 +1,56 @@
+use bytes::{Buf, BufMut, Bytes};
+
+use crate::err_protocol;
+use crate::error::Error;
+use crate::io::{BufExt, BufMutExt, Decode, Encode};
+use crate::mysql::protocol::Capabilities;
+use crate::mysql::protocol::auth::AuthPlugin;
+
+// https://dev.mysql.com/doc/dev/mysql-server/8.0.12/page_protocol_connection_phase_packets_protocol_auth_switch_request.html
+
+#[derive(Debug)]
+pub struct AuthSwitchRequest {
+    pub plugin: AuthPlugin,
+    pub data: Bytes,
+}
+
+impl Decode<'_> for AuthSwitchRequest {
+    fn decode_with(mut buf: Bytes, _: ()) -> Result<Self, Error> {
+        let header = buf.get_u8();
+        if header != 0xfe {
+            return Err(err_protocol!(
+                "expected 0xfe (AUTH_SWITCH) but found 0x{:x}",
+                header
+            ));
+        }
+
+        let plugin = buf.get_str_nul()?.parse()?;
+
+        // Scramble-based plugins send a NUL-terminated challenge; others
+        // (e.g. mysql_clear_password) may send no data at all.
+        // See: https://github.com/mysql/mysql-server/blob/ea7d2e2d16ac03afdd9cb72a972a95981107bf51/sql/auth/sha2_password.cc#L942
+        let data = match buf.last() {
+            Some(0) => buf.slice(..buf.len() - 1),
+            _ => buf,
+        };
+
+        Ok(Self { plugin, data })
+    }
+}
+
+impl Encode<'_, ()> for AuthSwitchRequest {
+    fn encode_with(&self, buf: &mut Vec<u8>, _: ()) {
+        buf.put_u8(0xfe);
+        buf.put_str_nul(self.plugin.name());
+        buf.extend(&self.data);
+    }
+}
+
+#[derive(Debug)]
+pub struct AuthSwitchResponse(pub Vec<u8>);
+
+impl Encode<'_, Capabilities> for AuthSwitchResponse {
+    fn encode_with(&self, buf: &mut Vec<u8>, _: Capabilities) {
+        buf.extend_from_slice(&self.0);
+    }
+}

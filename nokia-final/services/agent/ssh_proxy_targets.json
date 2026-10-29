@@ -1,0 +1,17 @@
+{
+  "targets": [
+    {
+      "name": "ssh-demo",
+      "host": "172.25.117.183",
+      "port": 22,
+      "listen_port": 2224
+    },
+    {
+      "name": "direct-wsl-test",
+      "mode": "direct",
+      "host": "172.25.117.183",
+      "port": 22,
+      "listen_port": 2226
+    }
+  ]
+}

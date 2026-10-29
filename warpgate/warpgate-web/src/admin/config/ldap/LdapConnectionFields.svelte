@@ -1,0 +1,107 @@
+<script lang="ts">
+    import { FormGroup, Input } from '@sveltestrap/sveltestrap'
+    import { LdapUsernameAttribute, type Tls } from 'admin/lib/api'
+    import TlsConfiguration from 'admin/TlsConfiguration.svelte'
+
+    interface Props {
+        host: string
+        port: number
+        bindDn: string
+        bindPassword: string
+        tls: Tls
+        userFilter: string
+        passwordPlaceholder?: string
+        passwordRequired?: boolean
+        usernameAttribute: LdapUsernameAttribute
+        sshKeyAttribute: string
+        uuidAttribute: string
+    }
+
+    let {
+        host = $bindable(),
+        port = $bindable(),
+        bindDn = $bindable(),
+        bindPassword = $bindable(),
+        usernameAttribute = $bindable(),
+        sshKeyAttribute = $bindable(),
+        uuidAttribute = $bindable(),
+        tls = $bindable(),
+        userFilter = $bindable(),
+        passwordPlaceholder = undefined,
+        passwordRequired = true,
+    }: Props = $props()
+
+    const usernameAttributeOptions = [
+        { value: LdapUsernameAttribute.Cn, name: 'CN' },
+        { value: LdapUsernameAttribute.Email, name: 'E-mail' },
+        {
+            value: LdapUsernameAttribute.UserPrincipalName,
+            name: 'User principal name',
+        },
+        {
+            value: LdapUsernameAttribute.SamAccountName,
+            name: 'SAM account name',
+        },
+        { value: LdapUsernameAttribute.Uid, name: 'UID' },
+    ]
+</script>
+
+<div class="mt-4">
+    <div class="row">
+        <div class="col-md-8 d-flex align-items-center gap-3">
+            <FormGroup floating label="Host" class="flex-grow-1">
+                <Input bind:value={host} required />
+            </FormGroup>
+        </div>
+        <div class="col-md-4">
+            <FormGroup floating label="Port">
+                <Input bind:value={port} type="number" required />
+            </FormGroup>
+        </div>
+    </div>
+    <TlsConfiguration bind:value={tls} class="flex-grow-1" />
+</div>
+
+<div class="mt-4 row">
+    <div class="col-md-6">
+        <FormGroup floating label="Bind username / DN">
+            <Input bind:value={bindDn} required />
+        </FormGroup>
+    </div>
+    <div class="col-md-6">
+        <FormGroup floating label="Bind password">
+            <Input
+                type="password"
+                bind:value={bindPassword}
+                placeholder={passwordPlaceholder}
+                required={passwordRequired}
+            />
+        </FormGroup>
+    </div>
+</div>
+
+<div class="mt-4 row">
+    <div class="col-md-6">
+        <FormGroup floating label="User query filter">
+            <Input bind:value={userFilter} />
+        </FormGroup>
+    </div>
+    <div class="col-md-6">
+        <FormGroup floating label="LDAP attribute to read usernames from">
+            <select class="form-control" bind:value={usernameAttribute}>
+                {#each usernameAttributeOptions as item (item.value)}
+                    <option value={item.value}>{item.name}</option>
+                {/each}
+            </select>
+        </FormGroup>
+        <FormGroup floating label="LDAP attribute to read SSH keys from">
+            <Input bind:value={sshKeyAttribute} placeholder="sshPublicKey" />
+        </FormGroup>
+        <FormGroup floating label="LDAP object UUID attribute">
+            <Input
+                bind:value={uuidAttribute}
+                placeholder="Automatic (objectGUID / entryUUID)"
+            />
+        </FormGroup>
+    </div>
+</div>

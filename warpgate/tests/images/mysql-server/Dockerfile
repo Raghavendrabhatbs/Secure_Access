@@ -1,0 +1,6 @@
+FROM mysql:9@sha256:c11782aa2a96624c1efc121768641d96954faa136d6aa82751b032d8c426ffbc
+
+ENV MYSQL_DATABASE=db
+ENV MYSQL_ROOT_PASSWORD=123
+
+ADD init.sql /docker-entrypoint-initdb.d

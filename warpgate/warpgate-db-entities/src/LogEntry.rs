@@ -1,0 +1,29 @@
+use poem_openapi::Object;
+use sea_orm::entity::prelude::*;
+use sea_orm::query::JsonValue;
+use serde::Serialize;
+use time::OffsetDateTime;
+use uuid::Uuid;
+
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Object)]
+#[sea_orm(table_name = "log")]
+#[oai(rename = "LogEntry")]
+pub struct Model {
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub id: Uuid,
+    #[sea_orm(column_type = "Text")]
+    pub text: String,
+    pub target: String,
+    pub values: JsonValue,
+    pub timestamp: OffsetDateTime,
+    pub session_id: Uuid,
+    pub username: Option<String>,
+    pub related_users: Option<String>,
+    pub related_access_roles: Option<String>,
+    pub related_admin_roles: Option<String>,
+}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {}
+
+impl ActiveModelBehavior for ActiveModel {}

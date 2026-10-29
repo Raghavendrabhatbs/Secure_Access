@@ -1,0 +1,67 @@
+version: '3'
+services:
+  oidc-server-mock:
+    container_name: oidc-server-mock
+    image: ghcr.io/soluto/oidc-server-mock:0.10.1
+    platform: linux/amd64
+    ports:
+      - '4011:8080'
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      SERVER_OPTIONS_INLINE: |
+        {
+          "AccessTokenJwtType": "JWT",
+          "Discovery": {
+            "ShowKeySet": true
+          },
+          "Authentication": {
+            "CookieSameSiteMode": "Lax",
+            "CheckSessionCookieSameSiteMode": "Lax"
+          }
+        }
+      LOGIN_OPTIONS_INLINE: |
+        {
+          "AllowRememberLogin": true
+        }
+      LOGOUT_OPTIONS_INLINE: |
+        {
+          "AutomaticRedirectAfterSignOut": true
+        }
+      IDENTITY_RESOURCES_INLINE: |
+        - Name: preferred_username
+          ClaimTypes:
+          - preferred_username
+      USERS_CONFIGURATION_INLINE: |
+        [
+          {
+            "SubjectId":"1",
+            "Username":"User1",
+            "Password":"pwd",
+            "Claims": [
+              {
+                "Type": "name",
+                "Value": "Sam Tailor",
+                "ValueType": "string"
+              },
+              {
+                "Type": "email",
+                "Value": "sam.tailor@gmail.com",
+                "ValueType": "string"
+              },
+              {
+                "Type": "preferred_username",
+                "Value": "sam_tailor",
+                "ValueType": "string"
+              },
+            ]
+          }
+        ]
+      CLIENTS_CONFIGURATION_PATH: /tmp/config/clients-config.json
+      ASPNET_SERVICES_OPTIONS_INLINE: |
+        {
+          "ForwardedHeadersOptions": {
+            "ForwardedHeaders" : "All"
+          }
+        }
+    volumes:
+      - .:/tmp/config:ro

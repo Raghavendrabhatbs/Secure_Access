@@ -1,0 +1,36 @@
+# Local configuration and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+# Local data and logs
+**/*.sqlite
+**/*.sqlite3
+**/*.sqlite-*
+**/*.db
+**/*.log
+**/recordings/
+rrweb/server/metadata/
+**/*.sql
+**/*.bak
+**/Attached Element Context*.txt
+*.zip
+
+# Dependencies, build output, and caches
+**/.venv/
+**/.venv*/
+**/venv/
+**/node_modules/
+**/target/
+**/dist/
+**/build/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/coverage/
+**/runtime-validation-report.md
