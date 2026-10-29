@@ -17,7 +17,7 @@
 rrweb/server/metadata/
 **/*.sql
 **/*.bak
-**/Attached Element Context*.txt
+**/*Attached Element Context*.txt
 *.zip
 
 # Dependencies, build output, and caches
